@@ -1,11 +1,12 @@
 package app
 
 import (
+	"ago_rest/pkg/offers"
+	"ago_rest/pkg/rest"
 	"encoding/json"
 	"github.com/go-chi/chi"
 	"log"
 	"net/http"
-	"rest/pkg/offers"
 	"strconv"
 )
 
@@ -16,6 +17,11 @@ type Server struct {
 
 func NewServer(offersSvc *offers.Service, router chi.Router) *Server {
 	return &Server{offersSvc: offersSvc, router: router}
+}
+
+type Result struct {
+	Resulg  string
+	Comment string `json:"comment", omitempty`
 }
 
 func (s *Server) Init() error {
@@ -38,16 +44,10 @@ func (s *Server) handleGetOffers(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	data, err := json.Marshal(items)
+	err = rest.WriteAsJson(writer, items)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	_, err = writer.Write(data)
-	if err != nil {
-		log.Print(err)
 	}
 }
 
@@ -66,16 +66,10 @@ func (s *Server) handleGetOfferByID(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	data, err := json.Marshal(item)
+	err = rest.WriteAsJson(writer, item)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	_, err = writer.Write(data)
-	if err != nil {
-		log.Print(err)
 	}
 }
 
@@ -93,16 +87,10 @@ func (s *Server) handleSaveOffer(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	data, err := json.Marshal(item)
+	err = rest.WriteAsJson(writer, item)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	_, err = writer.Write(data)
-	if err != nil {
-		log.Print(err)
 	}
 }
 

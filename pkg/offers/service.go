@@ -96,3 +96,27 @@ func (s *Service) Save(ctx context.Context, itemToSave *Offer) (*Offer, error) {
 	}
 	return itemToSave, nil
 }
+
+func (s *Service) Delete(ctx context.Context, id int64) (Offer, error) {
+	var offer Offer
+	tag, err := s.pool.Query(ctx,
+		`DELETE FROM offers WHERE id = $1 RETURNING id, comment, company, percent`,
+		id)
+	if err != nil {
+		return Offer{}, err
+	}
+	defer tag.Close()
+	for tag.Next() {
+		err = tag.Scan(
+			&offer.ID,
+			&offer.Comment,
+			&offer.Company,
+			&offer.Percent,
+		)
+		if err != nil {
+			return Offer{}, nil
+		}
+	}
+
+	return offer, nil
+}

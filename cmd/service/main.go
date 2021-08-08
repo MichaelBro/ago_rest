@@ -1,6 +1,8 @@
 package main
 
 import (
+	"ago_rest/cmd/service/app"
+	"ago_rest/pkg/offers"
 	"context"
 	"github.com/go-chi/chi"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -8,8 +10,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"rest/cmd/service/app"
-	"rest/pkg/offers"
 )
 
 const (
