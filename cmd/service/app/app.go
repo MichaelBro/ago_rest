@@ -95,5 +95,35 @@ func (s *Server) handleSaveOffer(writer http.ResponseWriter, request *http.Reque
 }
 
 func (s *Server) handleRemoveOfferByID(writer http.ResponseWriter, request *http.Request) {
-	panic("not implemented")
+	idParam := chi.URLParam(request, "id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		log.Println(err)
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	offer, err := s.offersSvc.Delete(request.Context(), id)
+	if offer.ID == 0 && offer.Percent == "" && offer.Company == "" && offer.Comment == "" {
+		res := Result{Resulg: "Error", Comment: "No such offer"}
+		writer.Header().Set("Content-Type", "application/json")
+		data, err := json.Marshal(res)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		_, err = writer.Write(data)
+		return
+	}
+	if err != nil {
+		log.Println(err)
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = rest.WriteAsJson(writer, offer)
+	if err != nil {
+		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
